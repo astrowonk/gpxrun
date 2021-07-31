@@ -8,11 +8,17 @@ import glob
 class GpxRun():
     """Class that analyzes GPX workout/run data"""
     gpx_data = None
+    silent = False
 
-    def __init__(self, file_path) -> None:
+    def __init__(self, file_path, silent=False) -> None:
         self.file_path = file_path
+        self.silent = silent
         self.get_gpx_data(file_path)
         self.analyze_gpx_data()
+
+    def silent_print(self, s):
+        if not self.silent:
+            print(s)
 
     @staticmethod
     def decimal_minutes_to_minutes_seconds(decimal_minutes):
@@ -63,16 +69,17 @@ class GpxRun():
             self.gpx_data['time_from_last_point'].sum())
 
         total_distance_meters = self.gpx_data['distance_from_last_point'].sum()
-        print("*" * 40)
-        print(f"Run Start Time {self.gpx_data['time'].iloc[0]}")
-        print(
+        self.silent_print("*" * 40)
+        self.silent_print(f"Run Start Time {self.gpx_data['time'].iloc[0]}")
+        self.silent_print(
             f"Total Distance: {total_distance_meters:.2f} meters. {(total_distance_meters / 1609.34):.2f} miles."
         )
         total_time_dec_min = self.gpx_data['time_from_last_point'].sum() / 60
         total_time_min, total_time_sec = self.decimal_minutes_to_minutes_seconds(
             total_time_dec_min)
-        print(f"Total time: {total_time_min}\' {total_time_sec:.2f}\"")
-        print(
+        self.silent_print(
+            f"Total time: {total_time_min}\' {total_time_sec:.2f}\"")
+        self.silent_print(
             f'Total pace: {self.decimal_minutes_to_formatted_string(self.run_mile_pace)}" min/mile'
         )  #copilot thanks
 
@@ -97,10 +104,10 @@ class GpxRun():
                 out['time_min']).apply(lambda x: x.total_seconds()) /
                (out['cummulative_sum_distance_miles_max'] -
                 out['cummulative_sum_distance_miles_min']) / 60).to_dict()
-        print("-" * 40)
-        print("Splits:")
+        self.silent_print("-" * 40)
+        self.silent_print("Splits:")
         for key, val in res.items():
-            print(
+            self.silent_print(
                 f'{int(key)} mile split: {self.decimal_minutes_to_formatted_string(val)}'
             )
         update_dict = {f"mile_{key}_split": val for key, val in res.items()}
@@ -115,10 +122,10 @@ class GpxRun():
         self.summary_data = pd.DataFrame([res_dict])
 
 
-def gpx_multi(input):
+def gpx_multi(input, silent=True):
     """Process glob of input and concat summary data from GpxRun class"""
     gpx_runs = []
     for f in glob.glob(input):
-        gpx_runs.append(GpxRun(f))
+        gpx_runs.append(GpxRun(f, silent=silent))
     gpx_runs = pd.concat([x.summary_data for x in gpx_runs])
     return gpx_runs

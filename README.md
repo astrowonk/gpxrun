@@ -15,3 +15,6 @@ g.gpx_data
 Example image of an apparently painfully slow run:
 
 <img width="1109" alt="Screen Shot 2021-07-31 at 6 07 44 PM" src="https://user-images.githubusercontent.com/13702392/127753435-a4d9196f-3361-48f3-8925-337328798fa2.png">
+
+Also includes a helper function `gpx_multi` which can process a glob of files and return a concattenated dataframe summary.
+
