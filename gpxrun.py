@@ -2,6 +2,7 @@ from gpxcsv import gpxtolist
 import pandas as pd
 import haversine as hs
 import numpy as np
+import glob
 
 
 class GpxRun():
@@ -9,7 +10,9 @@ class GpxRun():
     gpx_data = None
 
     def __init__(self, file_path) -> None:
+        self.file_path = file_path
         self.get_gpx_data(file_path)
+        self.analyze_gpx_data()
 
     @staticmethod
     def decimal_minutes_to_minutes_seconds(decimal_minutes):
@@ -17,6 +20,13 @@ class GpxRun():
         minutes = int(decimal_minutes)
         decimal_seconds = (decimal_minutes - minutes) * 60
         return minutes, decimal_seconds
+
+    @staticmethod
+    def decimal_minutes_to_formatted_string(decimal_minutes):
+        """Take decimal minutes and return formatted string"""
+        minutes, decimal_seconds = GpxRun.decimal_minutes_to_minutes_seconds(
+            decimal_minutes)
+        return f'{str(minutes):>2}\' {decimal_seconds:.1f}"'
 
     def get_gpx_data(self, file_path):
         self.gpx_data = pd.DataFrame(gpxtolist(file_path))
@@ -29,6 +39,8 @@ class GpxRun():
         self.gpx_data['lagged_time'] = self.gpx_data['time'].shift(1)
         self.gpx_data['ele_change_from_last_point'] = self.gpx_data[
             'ele'] - self.gpx_data['lagged_ele']
+        total_elevation_change = np.abs(
+            self.gpx_data['ele_change_from_last_point']).sum()
         self.gpx_data['great_circle_distance_from_last_point'] = self.gpx_data[
             ['lat', 'lon', 'lagged_lat',
              'lagged_lon']].apply(lambda x: hs.haversine(
@@ -49,18 +61,20 @@ class GpxRun():
         self.run_mile_pace = 26.8224 / (
             self.gpx_data['distance_from_last_point'].sum() /
             self.gpx_data['time_from_last_point'].sum())
-        pace_min, pace_sec = self.decimal_minutes_to_minutes_seconds(
-            self.run_mile_pace)
+
         total_distance_meters = self.gpx_data['distance_from_last_point'].sum()
+        print("*" * 40)
         print(f"Run Start Time {self.gpx_data['time'].iloc[0]}")
         print(
             f"Total Distance: {total_distance_meters:.2f} meters. {(total_distance_meters / 1609.34):.2f} miles."
         )
+        total_time_dec_min = self.gpx_data['time_from_last_point'].sum() / 60
         total_time_min, total_time_sec = self.decimal_minutes_to_minutes_seconds(
-            self.gpx_data['time_from_last_point'].sum() / 60)
+            total_time_dec_min)
         print(f"Total time: {total_time_min}\' {total_time_sec:.2f}\"")
-        print(f'Total pace: {pace_min}\' {pace_sec:.2f}" min/mile'
-              )  #copilot thanks
+        print(
+            f'Total pace: {self.decimal_minutes_to_formatted_string(self.run_mile_pace)}" min/mile'
+        )  #copilot thanks
 
         #can we do splits
         # we need cummulative sum distance in miles
@@ -84,7 +98,27 @@ class GpxRun():
                (out['cummulative_sum_distance_miles_max'] -
                 out['cummulative_sum_distance_miles_min']) / 60).to_dict()
         print("-" * 40)
-        print("Splits")
+        print("Splits:")
         for key, val in res.items():
-            pace_min, pace_sec = self.decimal_minutes_to_minutes_seconds(val)
-            print(f'{int(key)} mile split: {pace_min}\' {pace_sec}"')
+            print(
+                f'{int(key)} mile split: {self.decimal_minutes_to_formatted_string(val)}'
+            )
+        update_dict = {f"mile_{key}_split": val for key, val in res.items()}
+        res_dict = {
+            "start_time": self.gpx_data['time'].min(),
+            'total_time_minutes': total_time_dec_min,
+            'pace_mile': self.run_mile_pace,
+            "total_distance_meters": total_distance_meters,
+            "sum_abs_elevation_change_meters": total_elevation_change,
+        }
+        res_dict.update(update_dict)
+        self.summary_data = pd.DataFrame([res_dict])
+
+
+def gpx_multi(input):
+    """Process glob of input and concat summary data from GpxRun class"""
+    gpx_runs = []
+    for f in glob.glob(input):
+        gpx_runs.append(GpxRun(f))
+    gpx_runs = pd.concat([x.summary_data for x in gpx_runs])
+    return gpx_runs
