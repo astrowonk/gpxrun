@@ -5,6 +5,7 @@ import numpy as np
 
 
 class GpxRun():
+    """Class that analyzes GPX workout/run data"""
     gpx_data = None
 
     def __init__(self, file_path) -> None:
