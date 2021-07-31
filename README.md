@@ -18,3 +18,7 @@ Example image of an apparently painfully slow run:
 
 Also includes a helper function `gpx_multi` which can process a glob of files and return a concattenated dataframe summary.
 
+```python
+df = gpx_multi('*.gpx')
+```
+
