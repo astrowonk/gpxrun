@@ -1,3 +1,4 @@
+from tkinter import W
 from gpxcsv import gpxtolist
 import pandas as pd
 import haversine as hs
@@ -9,10 +10,18 @@ class GpxRun():
     """Class that analyzes GPX workout/run data"""
     gpx_data = None
     silent = False
+    time_col = None
+    rolling_window_size = None
 
-    def __init__(self, file_path, silent=False) -> None:
+    def __init__(self,
+                 file_path,
+                 silent=False,
+                 time_col='time',
+                 rolling_window_size=5) -> None:
         self.file_path = file_path
         self.silent = silent
+        self.rolling_window_size = rolling_window_size
+        self.time_col = time_col
         self.get_gpx_data(file_path)
         self.analyze_gpx_data()
 
@@ -36,13 +45,15 @@ class GpxRun():
 
     def get_gpx_data(self, file_path):
         self.gpx_data = pd.DataFrame(gpxtolist(file_path))
-        self.gpx_data['time'] = pd.to_datetime(self.gpx_data['time'])
+        self.gpx_data[self.time_col] = pd.to_datetime(
+            self.gpx_data[self.time_col])
+        self.gpx_data.sort_values(by=self.time_col, inplace=True)
 
-    def analyze_gpx_data(self, rolling_window_size=5):
+    def analyze_gpx_data(self):
         self.gpx_data['lagged_ele'] = self.gpx_data['ele'].shift(1)
         self.gpx_data['lagged_lat'] = self.gpx_data['lat'].shift(1)
         self.gpx_data['lagged_lon'] = self.gpx_data['lon'].shift(1)
-        self.gpx_data['lagged_time'] = self.gpx_data['time'].shift(1)
+        self.gpx_data['lagged_time'] = self.gpx_data[self.time_col].shift(1)
         self.gpx_data['ele_change_from_last_point'] = self.gpx_data[
             'ele'] - self.gpx_data['lagged_ele']
         total_elevation_change = np.abs(
@@ -56,12 +67,12 @@ class GpxRun():
             self.gpx_data['great_circle_distance_from_last_point']**2 +
             self.gpx_data['ele_change_from_last_point']**2)
         self.gpx_data['time_from_last_point'] = self.gpx_data[[
-            'time', 'lagged_time'
+            self.time_col, 'lagged_time'
         ]].apply(lambda x: (x[0] - x[1]).total_seconds(), axis=1)
         self.gpx_data['computed_rolling_speed'] = self.gpx_data[
-            'distance_from_last_point'].rolling(rolling_window_size).sum(
+            'distance_from_last_point'].rolling(self.rolling_window_size).sum(
             ) / self.gpx_data['time_from_last_point'].rolling(
-                rolling_window_size).sum()
+                self.rolling_window_size).sum()
         self.gpx_data['mile_pace_rolling'] = 26.8224 / self.gpx_data[
             'computed_rolling_speed']
         self.run_mile_pace = 26.8224 / (
@@ -70,7 +81,8 @@ class GpxRun():
 
         total_distance_meters = self.gpx_data['distance_from_last_point'].sum()
         self.silent_print("*" * 40)
-        self.silent_print(f"Run Start Time {self.gpx_data['time'].iloc[0]}")
+        self.silent_print(
+            f"Run Start Time {self.gpx_data[self.time_col].min()}")
         self.silent_print(
             f"Total Distance: {total_distance_meters:.2f} meters. {(total_distance_meters / 1609.34):.2f} miles."
         )
@@ -97,13 +109,14 @@ class GpxRun():
             self.gpx_data['cummulative_sum_distance_miles']) + 1.0
 
         out = self.gpx_data.groupby('mile_int')[[
-            'time', 'cummulative_sum_distance_miles'
+            self.time_col, 'cummulative_sum_distance_miles'
         ]].agg(['max', 'min'])
         out.columns = ['_'.join(x) for x in out.columns]
-        res = ((out['time_max'] -
-                out['time_min']).apply(lambda x: x.total_seconds()) /
-               (out['cummulative_sum_distance_miles_max'] -
-                out['cummulative_sum_distance_miles_min']) / 60).to_dict()
+        res = (
+            (out[f'{self.time_col}_max'] -
+             out[f'{self.time_col}_min']).apply(lambda x: x.total_seconds()) /
+            (out['cummulative_sum_distance_miles_max'] -
+             out['cummulative_sum_distance_miles_min']) / 60).to_dict()
         self.silent_print("-" * 40)
         self.silent_print("Splits:")
         for key, val in res.items():
@@ -112,7 +125,7 @@ class GpxRun():
             )
         update_dict = {f"mile_{key}_split": val for key, val in res.items()}
         res_dict = {
-            "start_time": self.gpx_data['time'].min(),
+            "start_time": self.gpx_data[self.time_col].min(),
             'total_time_minutes': total_time_dec_min,
             'pace_mile': self.run_mile_pace,
             "total_distance_meters": total_distance_meters,
@@ -122,10 +135,10 @@ class GpxRun():
         self.summary_data = pd.DataFrame([res_dict])
 
 
-def gpx_multi(input, silent=True):
+def gpx_multi(input, silent=True, **kwargs):
     """Process glob of input and concat summary data from GpxRun class"""
     gpx_runs = []
     for f in glob.glob(input):
-        gpx_runs.append(GpxRun(f, silent=silent))
+        gpx_runs.append(GpxRun(f, silent=silent, **kwargs))
     gpx_runs = pd.concat([x.summary_data for x in gpx_runs])
     return gpx_runs
