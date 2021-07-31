@@ -1,0 +1,6 @@
+*.gz
+*.gpx
+*.ipynb
+dist
+build
+*.pyc
