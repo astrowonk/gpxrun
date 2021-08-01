@@ -18,11 +18,15 @@ class GpxRun():
                  silent=False,
                  time_col='time',
                  rolling_window_size=5) -> None:
+        """Rolling window size only changes mile_pace_rolling and computer_rolling_speed. Summary stats are based on
+        cummulative sums and are uneffected by the rolling parameter."""
         self.file_path = file_path
         self.silent = silent
         self.rolling_window_size = rolling_window_size
         self.time_col = time_col
         self.get_gpx_data(file_path)
+        assert self.time_col in self.gpx_data.columns, f"{time_col} must be in gpx data columns. Specify alternative time column name."
+        self.summary_data = pd.DataFrame()
         self.analyze_gpx_data()
 
     def silent_print(self, s):
@@ -50,6 +54,10 @@ class GpxRun():
         self.gpx_data.sort_values(by=self.time_col, inplace=True)
 
     def analyze_gpx_data(self):
+        if not all(x in self.gpx_data.columns
+                   for x in ['lat', 'lon', 'ele', 'time']):
+            print("Not processing, missing lat, lon, ele, or time columns")
+            return
         self.gpx_data['lagged_ele'] = self.gpx_data['ele'].shift(1)
         self.gpx_data['lagged_lat'] = self.gpx_data['lat'].shift(1)
         self.gpx_data['lagged_lon'] = self.gpx_data['lon'].shift(1)
@@ -132,6 +140,8 @@ class GpxRun():
             "sum_abs_elevation_change_meters": total_elevation_change,
         }
         res_dict.update(update_dict)
+        if 'type' in self.gpx_data.columns:
+            res_dict.update({"type": self.gpx_data['type'].iloc[0]})
         self.summary_data = pd.DataFrame([res_dict])
 
 
@@ -139,6 +149,7 @@ def gpx_multi(input, silent=True, **kwargs):
     """Process glob of input and concat summary data from GpxRun class"""
     gpx_runs = []
     for f in glob.glob(input):
+        print(f"Processing file {f}")
         gpx_runs.append(GpxRun(f, silent=silent, **kwargs))
     gpx_runs = pd.concat([x.summary_data for x in gpx_runs])
     return gpx_runs
