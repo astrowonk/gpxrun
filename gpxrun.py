@@ -1,4 +1,3 @@
-from tkinter import W
 from gpxcsv import gpxtolist
 import pandas as pd
 import haversine as hs
