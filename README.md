@@ -7,7 +7,7 @@ to compute pace and speed (rather than just two adjacent points which are often 
 
 ```python
 git clone https://github.com/astrowonk/gpxrun.git
-cd gpxcsv
+cd gpxrun
 python setup.py install
 ```
 
