@@ -150,5 +150,6 @@ def gpx_multi(input, silent=True, **kwargs):
     for f in glob.glob(input):
         print(f"Processing file {f}")
         gpx_runs.append(GpxRun(f, silent=silent, **kwargs))
-    gpx_runs = pd.concat([x.summary_data for x in gpx_runs])
+    gpx_runs = pd.concat([x.summary_data
+                          for x in gpx_runs]).sort_values('start_time')
     return gpx_runs
