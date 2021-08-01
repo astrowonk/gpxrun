@@ -1,6 +1,12 @@
-*.gz
-*.gpx
+.ipynb_checkpoints/
 *.ipynb
-dist
+*.csv
+__pycache__
+**/__pycache__/**
+*.egg-info
 build
-*.pyc
+dist
+*.gpx
+*.gz
+*.json
+*.log
