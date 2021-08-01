@@ -3,7 +3,18 @@
 This class and utilities `gpxcsv` to convert to gpx files to pandas dataframes and perform simple analysis of speed,pace,time. It uses a rolling 5 second sum by default
 to compute pace and speed (rather than just two adjacent points which are often 1 second apart)
 
+## Install 
+
+```python
+git clone https://github.com/astrowonk/gpxrun.git
+cd gpxcsv
+python setup.py install
 ```
+
+## Use
+
+```
+from gpxrun import GpxRun
 g = GpxRun('myfile.gpx.gz')
 #summary frame of 1 row
 g.summary_data
