@@ -134,11 +134,20 @@ class GpxRun():
             )
         update_dict = {f"mile_{key}_split": val for key, val in res.items()}
         res_dict = {
-            "start_time": self.gpx_data[self.time_col].min(),
-            'total_time_minutes': total_time_dec_min,
-            'pace_mile': self.run_mile_pace,
-            "total_distance_meters": total_distance_meters,
-            "sum_abs_elevation_change_meters": total_elevation_change,
+            "start_time":
+            self.gpx_data[self.time_col].min(),
+            'total_time_minutes':
+            total_time_dec_min,
+            'pace_mile':
+            self.run_mile_pace,
+            'pace_mile_string':
+            self.decimal_minutes_to_formatted_string(self.run_mile_pace),
+            "total_distance_meters":
+            total_distance_meters,
+            "total_distance_miles":
+            total_distance_meters / 1609.344,
+            "sum_abs_elevation_change_meters":
+            total_elevation_change,
         }
         res_dict.update(update_dict)
         if 'type' in self.gpx_data.columns:
