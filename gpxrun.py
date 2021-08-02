@@ -4,6 +4,8 @@ import haversine as hs
 import numpy as np
 import glob
 
+__VERSION__ = '0.8.1'
+
 
 class GpxRun():
     """Class that analyzes GPX workout/run data"""
