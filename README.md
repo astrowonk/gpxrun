@@ -33,3 +33,10 @@ Also includes a helper function `gpx_multi` which can process a glob of files an
 df = gpx_multi('*.gpx')
 ```
 
+## Wait, why do I look so much slower with this?
+
+At least when it comes to the Apple Watch, pace/distance information shown in the Fitness app or during a workout is based on the __pedometer__, not the GPS. In theory, [the Watch calibrates itself](https://support.apple.com/en-us/HT204516) using the GPS so the pedometer is accurate. I know that I had disabled location services for **Motion Calibration and Distance**, and that when I finaly turned this on, suddenly the Watch started calibrating and within a run or two, it was telling me I was slower than I had been.
+
+In practice with `gpxrun`, an uncalibrated Watch will have the largest discrepencies with the GPS-based pace/speed/distance, but this gap will close if/as it is calibrated. So far, in about a week of calibration, the pace gap has dropped from over a minute to more like 20-30 seconds.
+
+How accurate is the pedometer can be when fully calibrated, I do not know yet. I will eventually update this readme comparing pace/distance data from `gpxrun` with what the pedometer-based distance iOS reports.
