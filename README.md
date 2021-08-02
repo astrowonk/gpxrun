@@ -40,3 +40,5 @@ At least when it comes to the Apple Watch, pace/distance information shown in th
 In practice with `gpxrun`, an uncalibrated Watch will have the largest discrepencies with the GPS-based pace/speed/distance, but this gap will close if/as it is calibrated. So far, in about a week of calibration, the pace gap has dropped from over a minute to more like 20-30 seconds.
 
 How accurate is the pedometer can be when fully calibrated, I do not know yet. I will eventually update this readme comparing pace/distance data from `gpxrun` with what the pedometer-based distance iOS reports.
+
+Another question, how accurate is GPS based pace/distance? The Watch reports GPS accuracy and it's +/- a meter or two. Presumably over a long run it's still accurate though.
