@@ -18,7 +18,7 @@ URL = 'https://github.com/astrowonk/gpxrun'
 EMAIL = 'marcos@marcoshuerta.com'
 AUTHOR = 'Marcos Huerta'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.8.1'
+VERSION = '0.8.2'
 
 # What packages are required for this module to be executed?
 REQUIRED = ['gpxcsv', 'lxml', 'haversine']

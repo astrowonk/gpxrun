@@ -152,6 +152,9 @@ class GpxRun():
         res_dict.update(update_dict)
         if 'type' in self.gpx_data.columns:
             res_dict.update({"type": self.gpx_data['type'].iloc[0]})
+        if 'hAcc' in self.gpx_data.columns:
+            res_dict.update(
+                {"avg_gps_accuracy_meters": self.gpx_data['hAcc'].mean()})
         self.summary_data = pd.DataFrame([res_dict])
 
 
