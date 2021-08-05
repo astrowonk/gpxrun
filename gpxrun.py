@@ -104,7 +104,9 @@ class GpxRun():
             f'Total pace: {self.decimal_minutes_to_formatted_string(self.run_mile_pace)}" min/mile'
         )  #copilot thanks
         if 'hAcc' in self.gpx_data.columns:
-            self.silent_print(f"Average GPS Accuracy {self.gpx_data['hAcc'].mean()}")
+            self.silent_print(
+                f"Average GPS Accuracy {(self.gpx_data['hAcc'].mean()):.2f} meters"
+            )
 
         #can we do splits
         # we need cummulative sum distance in miles
