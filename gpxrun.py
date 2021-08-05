@@ -2,6 +2,7 @@ from gpxcsv import gpxtolist
 import pandas as pd
 import haversine as hs
 import numpy as np
+import argparse
 import glob
 
 __VERSION__ = '0.8.1'
@@ -171,3 +172,12 @@ def gpx_multi(input, silent=True, **kwargs):
     gpx_runs = pd.concat([x.summary_data
                           for x in gpx_runs]).sort_values('start_time')
     return gpx_runs
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Process gpx files and output summary data')
+    parser.add_argument('file', help='a gpx file to process')
+    args = parser.parse_args()
+
+    GpxRun(args.file, silent=False)
