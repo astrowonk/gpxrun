@@ -4,8 +4,9 @@ import haversine as hs
 import numpy as np
 import argparse
 import glob
+import datetime
 
-__VERSION__ = '0.8.1'
+__VERSION__ = '0.8.5'
 
 
 class GpxRun():
@@ -90,24 +91,10 @@ class GpxRun():
             self.gpx_data['time_from_last_point'].sum())
 
         total_distance_meters = self.gpx_data['distance_from_last_point'].sum()
-        self.silent_print("*" * 40)
-        self.silent_print(
-            f"Run Start Time {self.gpx_data[self.time_col].min()}")
-        self.silent_print(
-            f"Total Distance: {total_distance_meters:.2f} meters. {(total_distance_meters / 1609.34):.2f} miles."
-        )
+
         total_time_dec_min = self.gpx_data['time_from_last_point'].sum() / 60
         total_time_min, total_time_sec = self.decimal_minutes_to_minutes_seconds(
             total_time_dec_min)
-        self.silent_print(
-            f"Total time: {total_time_min}\' {total_time_sec:.2f}\"")
-        self.silent_print(
-            f'Total pace: {self.decimal_minutes_to_formatted_string(self.run_mile_pace)}" min/mile'
-        )  #copilot thanks
-        if 'hAcc' in self.gpx_data.columns:
-            self.silent_print(
-                f"Average GPS Accuracy {(self.gpx_data['hAcc'].mean()):.2f} meters"
-            )
 
         #can we do splits
         # we need cummulative sum distance in miles
@@ -131,16 +118,12 @@ class GpxRun():
              out[f'{self.time_col}_min']).apply(lambda x: x.total_seconds()) /
             (out['cummulative_sum_distance_miles_max'] -
              out['cummulative_sum_distance_miles_min']) / 60).to_dict()
-        self.silent_print("-" * 40)
-        self.silent_print("Splits:")
-        for key, val in res.items():
-            self.silent_print(
-                f'{int(key)} mile split: {self.decimal_minutes_to_formatted_string(val)}'
-            )
+
         update_dict = {f"mile_{key}_split": val for key, val in res.items()}
         res_dict = {
             "start_time":
-            self.gpx_data[self.time_col].min(),
+            self.gpx_data[self.time_col].min().to_pydatetime().replace(
+                tzinfo=datetime.timezone.utc).astimezone(),
             'total_time_minutes':
             total_time_dec_min,
             'pace_mile':
@@ -161,6 +144,28 @@ class GpxRun():
             res_dict.update(
                 {"avg_gps_accuracy_meters": self.gpx_data['hAcc'].mean()})
         self.summary_data = pd.DataFrame([res_dict])
+        self.silent_print("*" * 40)
+        self.silent_print(
+            f"Run Start Time {res_dict['start_time'].strftime('%a %b %d %H:%m:%S %Z')}"
+        )
+        self.silent_print(
+            f"Total Distance: {total_distance_meters:.2f} meters. {(total_distance_meters / 1609.34):.2f} miles."
+        )
+        self.silent_print(
+            f"Total time: {total_time_min}\' {total_time_sec:.2f}\"")
+        self.silent_print(
+            f'Total pace: {self.decimal_minutes_to_formatted_string(self.run_mile_pace)}" min/mile'
+        )  #copilot thanks
+        if 'hAcc' in res_dict.keys():
+            self.silent_print(
+                f"Average GPS Accuracy {res_dict.get('avg_gps_accuracy_meters',0):.2f} meters"
+            )
+        self.silent_print("-" * 40)
+        self.silent_print("Splits:")
+        for key, val in res.items():
+            self.silent_print(
+                f'{int(key)} mile split: {self.decimal_minutes_to_formatted_string(val)}'
+            )
 
 
 def gpx_multi(input, silent=True, **kwargs):
