@@ -1,6 +1,6 @@
 # Gpx Run - Analyze GPX files for pace/distance/time
 
-This modules uses my [gpxcsv](https://pypi.org/project/gpxcsv/) module to convert to gpx files to pandas dataframes and perform simple analysis of speed, pace, and time.
+This modules uses my [gpxcsv](https://pypi.org/project/gpxcsv/) module to convert to gpx files to pandas dataframes and perform simple analysis of speed, pace, and time. You can see it in action [via my web app](https://marcoshuerta.com/gpxrun/).
 
 ## Install 
 
