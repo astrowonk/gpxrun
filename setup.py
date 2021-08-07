@@ -21,7 +21,7 @@ REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.8.5'
 
 # What packages are required for this module to be executed?
-REQUIRED = ['gpxcsv', 'lxml', 'haversine']
+REQUIRED = ['gpxcsv', 'lxml', 'haversine','pandas','numpy']
 
 # What packages are optional?
 EXTRAS = {
