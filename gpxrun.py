@@ -103,7 +103,7 @@ class GpxRun():
         self.gpx_data['cummulative_sum_time'] = self.gpx_data[
             'time_from_last_point'].cumsum()
         self.gpx_data['cummulative_sum_distance_miles'] = self.gpx_data[
-            'cummulative_sum_distance'] / 1609.34
+            'cummulative_sum_distance'] / 1609.344
         self.gpx_data['cummulative_sum_distance_miles'].fillna(0, inplace=True)
 
         self.gpx_data['mile_int'] = np.floor(
@@ -149,7 +149,7 @@ class GpxRun():
             f"Run Start Time {res_dict['start_time'].strftime('%a %b %d %H:%m:%S %Z')}"
         )
         self.silent_print(
-            f"Total Distance: {total_distance_meters:.2f} meters. {(total_distance_meters / 1609.34):.2f} miles."
+            f"Total Distance: {total_distance_meters:.2f} meters. {(total_distance_meters / 1609.344):.2f} miles."
         )
         self.silent_print(
             f"Total time: {total_time_min}\' {total_time_sec:.2f}\"")
