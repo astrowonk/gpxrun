@@ -36,7 +36,7 @@ df = gpx_multi('*.gpx')
 
 At least when it comes to the Apple Watch, pace/distance information shown in the Fitness app or during a workout is based on the __pedometer__, not the GPS. In theory, [the Watch calibrates itself](https://support.apple.com/en-us/HT204516) using the GPS so the pedometer is accurate. I know that I had disabled location services for **Motion Calibration and Distance**, and that when I finaly turned this on, suddenly the Watch started calibrating and within a run or two, it was telling me I was slower than I had been.
 
-In practice with `gpxrun`, an uncalibrated Watch will have the largest discrepencies with the GPS-based pace/speed/distance, but this gap will close if/as it is calibrated. So far, in about a week of calibration, the self-reported distances from the Watch pedometer are about 2%-3% larger than what I find in the GPS data in the GPX exported files (using HealthFit(https://apps.apple.com/us/app/healthfit/id1202650514)).
+In practice with `gpxrun`, an uncalibrated Watch will have the largest discrepencies with the GPS-based pace/speed/distance, but this gap will close if/as it is calibrated. So far, in about a week of calibration, the self-reported distances from the Watch pedometer are about 2%-3% larger than what I find in the GPS data in the GPX exported files (using HealthFit[https://apps.apple.com/us/app/healthfit/id1202650514]).
 
 How accurate is the pedometer can be when fully calibrated, I do not know yet. I will eventually update this readme comparing pace/distance data from `gpxrun` with what the pedometer-based distance iOS reports.
 
