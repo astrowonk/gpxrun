@@ -72,14 +72,14 @@ class GpxRun():
         self.gpx_data['great_circle_distance_from_last_point'] = self.gpx_data[
             ['lat', 'lon', 'lagged_lat',
              'lagged_lon']].apply(lambda x: hs.haversine(
-                 (x[0], x[1]), (x[2], x[3]), unit=hs.Unit.METERS),
+                 (x.iloc[0], x.iloc[1]), (x.iloc[2], x.iloc[3]), unit=hs.Unit.METERS),
                                   axis=1)
         self.gpx_data['distance_from_last_point'] = np.sqrt(
             self.gpx_data['great_circle_distance_from_last_point']**2 +
             self.gpx_data['ele_change_from_last_point']**2)
         self.gpx_data['time_from_last_point'] = self.gpx_data[[
             self.time_col, 'lagged_time'
-        ]].apply(lambda x: (x[0] - x[1]).total_seconds(), axis=1)
+        ]].apply(lambda x: (x.iloc[0] - x.iloc[1]).total_seconds(), axis=1)
         self.gpx_data['computed_rolling_speed'] = self.gpx_data[
             'distance_from_last_point'].rolling(self.rolling_window_size).sum(
             ) / self.gpx_data['time_from_last_point'].rolling(
@@ -104,7 +104,7 @@ class GpxRun():
             'time_from_last_point'].cumsum()
         self.gpx_data['cummulative_sum_distance_miles'] = self.gpx_data[
             'cummulative_sum_distance'] / 1609.344
-        self.gpx_data['cummulative_sum_distance_miles'].fillna(0, inplace=True)
+        self.gpx_data.fillna({'cummulative_sum_distance_miles':0}, inplace=True)
 
         self.gpx_data['mile_int'] = np.floor(
             self.gpx_data['cummulative_sum_distance_miles']) + 1.0
