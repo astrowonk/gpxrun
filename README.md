@@ -2,15 +2,22 @@
 
 This modules uses my [gpxcsv](https://pypi.org/project/gpxcsv/) module to convert to gpx files to pandas dataframes and perform simple analysis of speed, pace, and time. You can see it in action [via my web app](https://marcoshuerta.com/gpxrun/).
 
-## Install 
+## Install
 
-```python
-git clone https://github.com/astrowonk/gpxrun.git
-cd gpxrun
-python setup.py install
+```bash
+
+uv tool install "git+https://github.com/astrowonk/gpxrun"
+
 ```
 
-## Use
+or
+
+```bash
+uv pip install "git+https://github.com/astrowonk/gpxrun"
+
+```
+
+## Usage
 
 ```
 from gpxrun import GpxRun
@@ -21,6 +28,22 @@ g.summary_data
 #gpxcsv data frame augmented with computed rows
 g.gpx_data
 ```
+
+There is a CLI interface that just prints some basics:
+
+```
+gpxrun myfile.gpx
+
+```
+
+which can be run as a tool:
+
+```
+uvx "git+https://github.com/astrowonk/gpxrun" myrun.gpx
+
+```
+
+It will also accept gzipped gpx files: e.g. `myrun.gpx.gz`
 
 Example image of an apparently painfully slow run:
 
@@ -34,7 +57,7 @@ df = gpx_multi('*.gpx')
 
 ## Wait, why do I look so much slower with this?
 
-At least when it comes to the Apple Watch, pace/distance information shown in the Fitness app or during a workout is based on the __pedometer__, not the GPS. In theory, [the Watch calibrates itself](https://support.apple.com/en-us/HT204516) using the GPS so the pedometer is accurate. I know that I had disabled location services for **Motion Calibration and Distance**, and that when I finaly turned this on, suddenly the Watch started calibrating and within a run or two, it was telling me I was slower than I had been.
+At least when it comes to the Apple Watch, pace/distance information shown in the Fitness app or during a workout is based on the **pedometer**, not the GPS. In theory, [the Watch calibrates itself](https://support.apple.com/en-us/HT204516) using the GPS so the pedometer is accurate. I know that I had disabled location services for **Motion Calibration and Distance**, and that when I finaly turned this on, suddenly the Watch started calibrating and within a run or two, it was telling me I was slower than I had been.
 
 In practice with `gpxrun`, an uncalibrated Watch will have the largest discrepencies with the GPS-based pace/speed/distance, but this gap will close if/as it is calibrated. So far, in about a week of calibration, the self-reported distances from the Watch pedometer are about 2%-3% larger than what I find in the GPS data in the GPX exported files (using [HealthFit](https://apps.apple.com/us/app/healthfit/id1202650514)).
 
