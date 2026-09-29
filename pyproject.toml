@@ -1,25 +1,25 @@
 [build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
-
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "gpxrun"
 version = "0.8.5"
 description = "Analyzes GPS data in a GPX file and produces some basic summary pace/distance information."
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 
 authors = [{ name = "Marcos Huerta", email = "marcos@marcoshuerta.com" }]
 
 dependencies = ["gpxcsv", "lxml", "haversine", "pandas", "numpy"]
 
+
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
@@ -27,7 +27,14 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/astrowonk/gpxrun"
 
+[[tool.hatch.envs.test.matrix]]
+python = ["38", "39", "310", "311", "312", "313"]
 
-[tool.setuptools]
-py-modules = ["gpxrun"]
-include-package-data = true
+[tool.hatch.build.targets.sdist]
+exclude = ["/.github"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gpxrun"]
+
+[project.scripts]
+gpxrun = "gpxrun.__main__:main"
