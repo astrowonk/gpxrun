@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "gpxrun"
+version = "0.8.5"
+description = "Analyzes GPS data in a GPX file and produces some basic summary pace/distance information."
+readme = "README.md"
+requires-python = ">=3.6"
+license = { text = "MIT" }
+
+authors = [{ name = "Marcos Huerta", email = "marcos@marcoshuerta.com" }]
+
+dependencies = ["gpxcsv", "lxml", "haversine", "pandas", "numpy"]
+
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+[project.urls]
+Homepage = "https://github.com/astrowonk/gpxrun"
+
+
+[tool.setuptools]
+py-modules = ["gpxrun"]
+include-package-data = true
